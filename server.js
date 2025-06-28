@@ -234,7 +234,7 @@ app.use(errorHandler);
 
 // Get admin address (for frontend to know where to send USDT)
 app.get('/', (req, res) => {
-    res.send(`backend deployed....${PORT}`)
+    res.send(`backend deployed on port${PORT}`)
 });
 
 server.listen(PORT, () => console.log("Server is running on PORT: " + PORT));
