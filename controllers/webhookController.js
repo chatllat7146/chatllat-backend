@@ -140,7 +140,7 @@ async function updateDataWhenFundsIsWithdraw(
     }
 }
 
-export const transectionConfirmation = asyncHandler(async (req, res) => {
+export const transectionConfirmation = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         console.log(reqData, "req.body======");
@@ -206,11 +206,11 @@ export const transectionConfirmation = asyncHandler(async (req, res) => {
 
         return give_response(res, 200, true, "webhook called", {});
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-// export const transectionConfirmation = asyncHandler(async (req, res) => {
+// export const transectionConfirmation = asyncHandler(async (req, res, next) => {
 //     try {
 //         const reqData = req.body
 //         console.log(reqData, "req.body======");

@@ -13,7 +13,7 @@ export const disputeAdd = async (validatedData, agreement) => {
             evidence,
             connectedWallet,
         } = validatedData;
-
+        
         const disputeCreator =
             connectedWallet === agreement.payerWallet ? "Payer" : "Receiver";
 

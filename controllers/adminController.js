@@ -3,8 +3,10 @@ import give_response from "../helper/help.js";
 import bcryptjs from "bcryptjs";
 import { generateToken } from "../lib/utils.js";
 import Admin from "../models/Admin.js";
+import SupportTeam from "../models/SupportTeam.js";
 import {
     addHashSchema,
+    addSupportTeamUserSchema,
     adminLoginSchema,
     getPaymentDetailSchema,
     reAssignedDisputeSchema,
@@ -14,8 +16,10 @@ import Agreement from "../models/Agreement.js";
 import { addHashLink, fetchPaymentDetails } from "../utils/service/admin.js";
 import { allTickets } from "../utils/service/support.js";
 import { allTicketSchema } from "../utils/validation/supportTeam_validation.js";
+import supportUserCredentialMail from "../utils/email_template/supportUserCredential.js";
+import { sendEmail } from "../utils/service/sendEmail.js";
 
-export const createAdmin = asyncHandler(async (req, res) => {
+export const createAdmin = asyncHandler(async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
@@ -34,11 +38,11 @@ export const createAdmin = asyncHandler(async (req, res) => {
             admin,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const login = asyncHandler(async (req, res) => {
+export const login = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const validatedData = await adminLoginSchema.validateAsync(reqData);
@@ -64,11 +68,11 @@ export const login = asyncHandler(async (req, res) => {
             token,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const reAssignedDispute = asyncHandler(async (req, res) => {
+export const reAssignedDispute = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const validatedData = await reAssignedDisputeSchema.validateAsync(
@@ -90,7 +94,7 @@ export const reAssignedDispute = asyncHandler(async (req, res) => {
             dispute
         );
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
@@ -119,11 +123,11 @@ export const addHash = asyncHandler(async (req, res, next) => {
             updatedAgreement
         );
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const getAllTickets = asyncHandler(async (req, res) => {
+export const getAllTickets = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.query;
         const validatedData = await allTicketSchema.validateAsync(reqData);
@@ -134,11 +138,11 @@ export const getAllTickets = asyncHandler(async (req, res) => {
             tickets,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const getPaymentDetails = asyncHandler(async (req, res) => {
+export const getPaymentDetails = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.query;
         const validatedData = await getPaymentDetailSchema.validateAsync(
@@ -146,12 +150,46 @@ export const getPaymentDetails = asyncHandler(async (req, res) => {
         );
         const { disputeId } = validatedData;
 
-        const dispute = await fetchPaymentDetails(disputeId)
-        
+        const dispute = await fetchPaymentDetails(disputeId);
+
         give_response(res, 200, true, "Payment details get successfully", {
             dispute,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
+    }
+});
+
+export const addSupportTeamUser = asyncHandler(async (req, res, next) => {
+    try {
+        const reqData = req.body;
+        const validatedData = await addSupportTeamUserSchema.validateAsync(
+            reqData
+        );
+        const { email, password, fname, lname, contact } = validatedData;
+
+        const isExist = await SupportTeam.findOne({ email });
+        if (isExist)
+            return give_response(res, 400, false, "User already exist");
+
+        const hashPass = await bcryptjs.hash(password, 8);
+        const user = await SupportTeam.create({
+            email,
+            password: hashPass,
+            fname,
+            lname,
+            contact,
+        });
+        
+        const username = fname + " " + lname
+        const { html } = supportUserCredentialMail(username, email, password);
+        await sendEmail(html, email, "Login Credential");
+
+        delete user._doc.password;
+        give_response(res, 200, true, "Support user add successfully", {
+            user,
+        });
+    } catch (error) {
+        next(error);
     }
 });

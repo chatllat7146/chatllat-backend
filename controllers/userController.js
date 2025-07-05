@@ -21,7 +21,7 @@ export const createProfile = asyncHandler(async (req, res, next) => {
             user,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
@@ -44,7 +44,7 @@ export const updateProfile = asyncHandler(async (req, res, next) => {
             updatedUser,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+       next(error);
     }
 });
 
@@ -70,7 +70,7 @@ export const addRating = asyncHandler(async (req, res, next) => {
         );
         return give_response(res, 200, true, "Rating added successfully", {});
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
@@ -98,6 +98,6 @@ export const getProfile = asyncHandler(async (req, res, next) => {
             user: result[0],
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });

@@ -14,6 +14,7 @@ import SupportTeamRouter from "./routes/supportTeamRoutes.js";
 import recordWithdrawalRouter from "./routes/withdrawalRoutes.js";
 import swapRouter from "./routes/swapRoutes.js";
 import adminRouter from "./routes/AdminRoutes.js";
+import postRouter from "./routes/postRoutes.js";
 
 import { Server } from "socket.io";
 import Agreement from "./models/Agreement.js";
@@ -51,6 +52,7 @@ app.use("/api/supportTeam", SupportTeamRouter);
 app.use("/api/withdraw", recordWithdrawalRouter);
 app.use("/api/swap", swapRouter);
 app.use("/api/admin", adminRouter);
+app.use("/api/post", postRouter);
 app.use(
     "/api/webhook",
     express.raw({ type: "application/json" }),
@@ -232,7 +234,7 @@ app.use(errorHandler);
 //     });
 // });
 
-// Get admin address (for frontend to know where to send USDT)
+
 app.get('/', (req, res) => {
     res.send(`backend deployed on port${PORT}`)
 });

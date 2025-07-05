@@ -13,7 +13,7 @@ import {
     evidenceAdd,
 } from "../utils/service/dispute.js";
 
-export const createDispute = asyncHandler(async (req, res) => {
+export const createDispute = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const validatedData = await createDisputeSchema.validateAsync(reqData);
@@ -23,17 +23,22 @@ export const createDispute = asyncHandler(async (req, res) => {
         if (!agreement)
             return give_response(res, 404, false, "Agreement not found");
 
+        const isDispute = await Dispute.findOne({ agreementId });
+        if (isDispute) {
+            return give_response(res, 409, false, "Dispute already raised")
+        }
+
         const dispute = await disputeAdd(validatedData, agreement);
 
         return give_response(res, 200, true, "Dispute create successfully", {
             dispute,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const addEvidence = asyncHandler(async (req, res) => {
+export const addEvidence = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const validatedData = await addEvidenceSchema.validateAsync(reqData);
@@ -47,12 +52,12 @@ export const addEvidence = asyncHandler(async (req, res) => {
 
         return give_response(res, 200, true, "Evidence add successfully", {});
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
 //  get Dispute data for particular wallet
-export const getDisputesByWalletId = asyncHandler(async (req, res) => {
+export const getDisputesByWalletId = asyncHandler(async (req, res, next) => {
     try {
         const { connectedWalletId } = req.query;
         const disputes = await disputesByWalletId(connectedWalletId);
@@ -61,12 +66,12 @@ export const getDisputesByWalletId = asyncHandler(async (req, res) => {
             disputes,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
 //  get Dispute details by agreementId
-export const getDisputeDetails = asyncHandler(async (req, res) => {
+export const getDisputeDetails = asyncHandler(async (req, res, next) => {
     try {
         const { agreementId } = req.query;
 
@@ -82,22 +87,45 @@ export const getDisputeDetails = asyncHandler(async (req, res) => {
             { dispute }
         );
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-// export const updateEvidence = asyncHandler(async (req, res, next) => {
-//     try {
-//         const reqData = req.body
-//         const validatedData = await updateEvidenceSchema(reqData)
-//         const { disputeId, evidence } = validatedData
+export const updateEvidence = asyncHandler(async (req, res, next) => {
+    try {
+        const { disputeId, evidence, connectedWalletId } =
+            await updateEvidenceSchema.validateAsync(req.body);
+        const dispute = await Dispute.findOne({ disputeId });
 
-//     } catch (error) {
-//         next(error)
-//     }
-// }) 
+        const field =
+            connectedWalletId === dispute.payerWalletAddress
+                ? "payerEvidence"
+                : "receiverEvidence";
+        const dateField =
+            connectedWalletId === dispute.payerWalletAddress
+                ? "payerSubmittedProof"
+                : "receiverSubmittedProof";
 
-// export const addSupportMemberInDispute = asyncHandler(async (req, res) => {
+        const updatedDispute = await Dispute.findOneAndUpdate(
+            { disputeId },
+            {
+                $set: {
+                    [`evidence.${field}`]: evidence,
+                    [`date.${dateField}`]: new Date(),
+                },
+            },
+            { new: true }
+        );
+
+        give_response(res, 200, true, "Evidence updated successfully", {
+            updatedDispute,
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+// export const addSupportMemberInDispute = asyncHandler(async (req, res, next) => {
 //     try {
 //         const { supportTeamUserId, agreementId } = req.body;
 //         const support = await Support.findOne({_id: supportTeamUserId})

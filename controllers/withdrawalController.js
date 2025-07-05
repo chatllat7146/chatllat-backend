@@ -42,6 +42,6 @@ export const getSignature = asyncHandler(async (req, res, next) => {
             signer,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });

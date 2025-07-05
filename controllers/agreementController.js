@@ -22,7 +22,7 @@ import {
     walletAddressAdd,
 } from "../utils/service/agreement.js";
 
-export const createNewAgreement = asyncHandler(async (req, res) => {
+export const createNewAgreement = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const validatedData = await createAgreementSchema.validateAsync(
@@ -87,13 +87,14 @@ export const createNewAgreement = asyncHandler(async (req, res) => {
             shareableLink: `${req.protocol}://${req.get(
                 "host"
             )}/view-agreement/${agreementId}`,
+            newShareLink: `http://localhost:5174/agreements/${agreementId}`
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const getAgreementById = asyncHandler(async (req, res) => {
+export const getAgreementById = asyncHandler(async (req, res, next) => {
     try {
         const { id } = req.params;
         const agreement = await Agreement.findOne({
@@ -113,11 +114,11 @@ export const getAgreementById = asyncHandler(async (req, res) => {
             agreement,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const getAllAgreement = asyncHandler(async (req, res) => {
+export const getAllAgreement = asyncHandler(async (req, res, next) => {
     try {
         const { walletAddress } = req.params;
 
@@ -133,11 +134,11 @@ export const getAllAgreement = asyncHandler(async (req, res) => {
             agreements,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const addWalletAddress = asyncHandler(async (req, res) => {
+export const addWalletAddress = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const validatedData = await addWalletAddressSchema.validateAsync(
@@ -161,7 +162,7 @@ export const addWalletAddress = asyncHandler(async (req, res) => {
             updatedAgreement,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
@@ -193,11 +194,11 @@ export const updateAgreementDetails = asyncHandler(async (req, res, next) => {
             updatedAgreement,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const addPersonalDetails = asyncHandler(async (req, res) => {
+export const addPersonalDetails = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const validatedData = await addPersonalDetailsSchema.validateAsync(
@@ -218,11 +219,11 @@ export const addPersonalDetails = asyncHandler(async (req, res) => {
             updatedAgreement,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const requestDeposit = asyncHandler(async (req, res) => {
+export const requestDeposit = asyncHandler(async (req, res, next) => {
     try {
         // change status = RequestedDeposit
         const reqData = req.body;
@@ -245,11 +246,11 @@ export const requestDeposit = asyncHandler(async (req, res) => {
             agreement: updatedAgreement,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-// export const requestWithdrawal = asyncHandler(async (req, res) => {
+// export const requestWithdrawal = asyncHandler(async (req, res, next) => {
 //     try {
 //         // change status = RequestedWithdrawal
 //         const reqData = req.body;
@@ -277,7 +278,7 @@ export const requestDeposit = asyncHandler(async (req, res) => {
 // });
 
 // change status = WorkSubmitted when work as done
-export const setWorkSubmittedStatus = asyncHandler(async (req, res) => {
+export const setWorkSubmittedStatus = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const validatedData = await agreementIdSchema.validateAsync(reqData);
@@ -310,12 +311,12 @@ export const setWorkSubmittedStatus = asyncHandler(async (req, res) => {
             updatedAgreement,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
 // change status = FundsReleased when WorkSubmitted
-export const setFundsReleasedStatus = asyncHandler(async (req, res) => {
+export const setFundsReleasedStatus = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const validatedData = await agreementIdSchema.validateAsync(reqData);
@@ -342,12 +343,12 @@ export const setFundsReleasedStatus = asyncHandler(async (req, res) => {
             updatedAgreement,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
 //  get Disputed status agreement data
-export const getDisputedStatusAgreement = asyncHandler(async (req, res) => {
+export const getDisputedStatusAgreement = asyncHandler(async (req, res, next) => {
     try {
         const { connectedWalletId } = req.query;
         const agreements = await Agreement.find({
@@ -362,12 +363,12 @@ export const getDisputedStatusAgreement = asyncHandler(async (req, res) => {
             agreements,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
 // Get Withdrawal Agreement Data
-export const getWithdrawalAgreement = asyncHandler(async (req, res) => {
+export const getWithdrawalAgreement = asyncHandler(async (req, res, next) => {
     try {
         const { connectedWalletId } = req.query;
         const agreements = await Agreement.aggregate([
@@ -399,11 +400,11 @@ export const getWithdrawalAgreement = asyncHandler(async (req, res) => {
             { agreements }
         );
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-// export const getWithdrawalAgreement = asyncHandler(async (req, res) => {
+// export const getWithdrawalAgreement = asyncHandler(async (req, res, next) => {
 //     try {
 //         const { connectedWalletId } = req.query;
 
@@ -484,7 +485,7 @@ export const getWithdrawalAgreement = asyncHandler(async (req, res) => {
 //     }
 // });
 
-export const cancelAgreement = asyncHandler(async (req, res) => {
+export const cancelAgreement = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const validatedData = await cancelAgreementSchema.validateAsync(
@@ -517,6 +518,6 @@ export const cancelAgreement = asyncHandler(async (req, res) => {
             { agreement }
         );
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });

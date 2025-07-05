@@ -5,7 +5,7 @@ import Dispute from "../models/Dispute.js";
 import Agreement from "../models/Agreement.js";
 import GroupChat from "../models/GroupChat.js";
 
-export const createGroupChat = asyncHandler(async (req, res) => {
+export const createGroupChat = asyncHandler(async (req, res, next) => {
     try {
         const { agreementId } = req.body;
 
@@ -34,11 +34,11 @@ export const createGroupChat = asyncHandler(async (req, res) => {
             groupChat,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+       next(error);
     }
 });
 
-export const getChatList = asyncHandler(async (req, res) => {
+export const getChatList = asyncHandler(async (req, res, next) => {
     const userId = req.query.connectedWalletId;
     
     try {
@@ -107,14 +107,11 @@ export const getChatList = asyncHandler(async (req, res) => {
             chatList: chatList,
         });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        next(error);
     }
 });
 
-export const getPersonalChatMessages = asyncHandler(async (req, res) => {
+export const getPersonalChatMessages = asyncHandler(async (req, res, next) => {
     try {
         const { sender, receiver } = req.query;
         await Chat.updateMany(
@@ -132,11 +129,11 @@ export const getPersonalChatMessages = asyncHandler(async (req, res) => {
             messages,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const getChatMessages = asyncHandler(async (req, res) => {
+export const getChatMessages = asyncHandler(async (req, res, next) => {
     try {
         const { sender, receiver, groupId } = req.query; // sender id = connected wallet id
 
@@ -206,6 +203,6 @@ export const getChatMessages = asyncHandler(async (req, res) => {
             messages,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });

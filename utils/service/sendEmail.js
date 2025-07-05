@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 
-export const sendEmail = async (html, subject) => {
+export const sendEmail = async (html, email, subject) => {
     try {
         const transporter = nodemailer.createTransport({
             service: process.env.MAIL_SERVICE,
@@ -17,7 +17,7 @@ export const sendEmail = async (html, subject) => {
         // send mail with defined transport object
         const mailOptions = {
             from: `Chatllat <${process.env.MAIL_AUTH_CREDENTIAL_USER}>`,
-            to: "test01.rentechdigital@gmail.com",
+            to: email,
             subject,
             html,
         };

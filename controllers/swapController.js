@@ -9,6 +9,6 @@ export const swapAmount = asyncHandler(async (req, res, next) => {
         give_response(res, 200, true, "Amount swap successfully!", swap)
 
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+       next(error);
     }
 });

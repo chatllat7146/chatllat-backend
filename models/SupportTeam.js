@@ -31,14 +31,14 @@ const supportTeamSchema = new mongoose.Schema(
             type: Boolean, 
             default: 0     // 0 = offline, 1 = online
         },
-        signupOtp: {
-            type: Number,
-            trim: true,
-            select: false,
-        },
-        signupOtp_timestamp: {
-            type: Date,
-        },
+        // signupOtp: {
+        //     type: Number,
+        //     trim: true,
+        //     select: false,
+        // },
+        // signupOtp_timestamp: {
+        //     type: Date,
+        // },
         forgotOtp: {
             type: Number,
             trim: true,

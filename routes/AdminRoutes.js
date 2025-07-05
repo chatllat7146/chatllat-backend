@@ -1,6 +1,7 @@
 import express from "express";
 import {
     addHash,
+    addSupportTeamUser,
     createAdmin,
     getAllTickets,
     getPaymentDetails,
@@ -16,5 +17,6 @@ router.post("/dispute/reAssign", adminAuth, reAssignedDispute);
 router.post("/add/hash", adminAuth, addHash);
 router.get("/all/tickets", adminAuth, getAllTickets);
 router.get("/payment/details", adminAuth, getPaymentDetails);
+router.post("/add/support/user", adminAuth, addSupportTeamUser);
 
 export default router;

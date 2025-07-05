@@ -10,7 +10,7 @@ export const getNotification = asyncHandler(async (req, res, next) => {
         return give_response(res, 200, true, "Notification get successfully", { notification });
 
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 })
 

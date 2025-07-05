@@ -2,7 +2,13 @@ import joi from 'joi';
 
 export const createAgreementSchema = joi.object({
     role: joi.string().valid("Payer", "Receiver").required(),
-    creatorWallet: joi.string().required(),
+    // creatorWallet: joi.string().required().message({
+    //      'any.required': 'agreementId is required'
+    // }),
+     creatorWallet: joi.string().required().messages({
+        'any.required': 'creatorWallet is required',
+        'string.base': 'creatorWallet must be a string',
+    }),
     name: joi.string(),
     chain: joi.string(),
     email: joi.string().email(),

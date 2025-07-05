@@ -29,7 +29,7 @@ import {
     splitAmount,
 } from "../utils/service/support.js";
 
-// export const createSupportTeam = asyncHandler(async (req, res) => {
+// export const createSupportTeam = asyncHandler(async (req, res, next) => {
 //     try {
 //         const { name, email, contact, profileImage } = req.body;
 //         const support = await SupportTeam.create({
@@ -47,7 +47,7 @@ import {
 //     }
 // });
 
-export const signup = asyncHandler(async (req, res) => {
+export const signup = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const validatedData = await signupSchema.validateAsync(reqData);
@@ -77,11 +77,11 @@ export const signup = asyncHandler(async (req, res) => {
         delete user._doc.signupOtp;
         give_response(res, 200, true, "Signup successfully", user);
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const signupOtpVerify = asyncHandler(async (req, res) => {
+export const signupOtpVerify = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const validatedData = await signupOtpVerifySchema.validateAsync(
@@ -113,11 +113,11 @@ export const signupOtpVerify = asyncHandler(async (req, res) => {
 
         give_response(res, 200, true, "Otp verified!");
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const login = asyncHandler(async (req, res) => {
+export const login = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const validatedData = await loginSchema.validateAsync(reqData);
@@ -132,13 +132,13 @@ export const login = asyncHandler(async (req, res) => {
                 "User not exist with this email"
             );
 
-        if (user.isVerify === false)
-            return give_response(
-                res,
-                400,
-                false,
-                "Please verify your account via OTP before logging in."
-            );
+        // if (user.isVerify === false)
+        //     return give_response(
+        //         res,
+        //         400,
+        //         false,
+        //         "Please verify your account via OTP before logging in."
+        //     );
 
         const isMatch = await bcryptjs.compare(password, user.password);
         if (!isMatch) return give_response(res, 400, false, "Wrong password");
@@ -151,11 +151,11 @@ export const login = asyncHandler(async (req, res) => {
             token,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const sendForgotOtp = asyncHandler(async (req, res) => {
+export const sendForgotOtp = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const validatedData = await sendForgotOtpSchema.validateAsync(reqData);
@@ -180,11 +180,11 @@ export const sendForgotOtp = asyncHandler(async (req, res) => {
 
         give_response(res, 200, true, "OTP has been sent");
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const verifyForgotOtp = asyncHandler(async (req, res) => {
+export const verifyForgotOtp = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const validatedData = await verifyForgotOtpSchema.validateAsync(
@@ -220,11 +220,11 @@ export const verifyForgotOtp = asyncHandler(async (req, res) => {
 
         give_response(res, 200, true, "Otp verified!");
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const resetPassword = asyncHandler(async (req, res) => {
+export const resetPassword = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const validatedData = await resetPasswordSchema.validateAsync(reqData);
@@ -254,11 +254,11 @@ export const resetPassword = asyncHandler(async (req, res) => {
 
         give_response(res, 200, true, "Password reset successfully!");
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const changePassword = asyncHandler(async (req, res) => {
+export const changePassword = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const validatedData = await changePasswordSchema.validateAsync(reqData);
@@ -291,11 +291,11 @@ export const changePassword = asyncHandler(async (req, res) => {
 
         give_response(res, 200, true, "Password changed successfully!");
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const resendOtp = asyncHandler(async (req, res) => {
+export const resendOtp = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const { email, type } = reqData;
@@ -337,11 +337,11 @@ export const resendOtp = asyncHandler(async (req, res) => {
 
         give_response(res, 200, true, "Otp resend successfully!");
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const getAllTickets = asyncHandler(async (req, res) => {
+export const getAllTickets = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.query;
         const validatedData = await allTicketSchema.validateAsync(reqData);
@@ -352,11 +352,11 @@ export const getAllTickets = asyncHandler(async (req, res) => {
             tickets,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const ticketDetails = asyncHandler(async (req, res) => {
+export const ticketDetails = asyncHandler(async (req, res, next) => {
     try {
         const { disputeId } = req.query;
         const ticketDetails = await getTicketDetails(disputeId);
@@ -365,11 +365,11 @@ export const ticketDetails = asyncHandler(async (req, res) => {
             ticketDetails,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const myTicketDetails = asyncHandler(async (req, res) => {
+export const myTicketDetails = asyncHandler(async (req, res, next) => {
     try {
         const { ticketId } = req.query;
         const ticketDetail = await getMyTicketDetails(ticketId);
@@ -378,7 +378,7 @@ export const myTicketDetails = asyncHandler(async (req, res) => {
             ticketDetail,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
@@ -391,18 +391,18 @@ export const myAllTickets = asyncHandler(async (req, res, next) => {
 
         give_response(res, 200, true, "Tickets get successfully", { tickets });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const splitDisputeAmount = asyncHandler(async (req, res) => {
+export const splitDisputeAmount = asyncHandler(async (req, res, next) => {
     try {
         const reqData = req.body;
         const validatedData = await splitDisputeAmountSchema.validateAsync(
             reqData
         );
         const { payerAmountPercent, receiverAmountPercent, agreementId } =
-        validatedData;
+            validatedData;
 
         if (payerAmountPercent + receiverAmountPercent !== 100) {
             return give_response(
@@ -425,11 +425,11 @@ export const splitDisputeAmount = asyncHandler(async (req, res) => {
             updatedAgreement,
         });
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });
 
-export const takeATicket = asyncHandler(async (req, res) => {
+export const takeATicket = asyncHandler(async (req, res, next) => {
     try {
         const { disputeId } = req.body;
         const agentId = req.userId;
@@ -461,6 +461,6 @@ export const takeATicket = asyncHandler(async (req, res) => {
             {}
         );
     } catch (error) {
-        return give_response(res, 500, false, error.message);
+        next(error);
     }
 });

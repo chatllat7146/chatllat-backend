@@ -27,5 +27,6 @@ export const addEvidenceSchema = joi.object({
 
 export const updateEvidenceSchema = joi.object({
     disputeId: joi.string().required(),
-    evidence: joi.array().required()
+    evidence: joi.array().required(),
+    connectedWalletId: joi.string().required()
 })
