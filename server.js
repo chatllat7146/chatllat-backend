@@ -62,11 +62,11 @@ app.use(
 app.use(errorHandler);
 
 // Initialize socket.io server
-// export const io = new Server(server, {
-//     cors: { origin: "*" },
-// });
-// global.io = io;
-// global.users = {};
+const io = new Server(server, {
+    cors: { origin: "*" },
+});
+global.io = io;
+global.users = {};
 
 // io.on("connection", async (socket) => {
 //     console.log("User connected");
