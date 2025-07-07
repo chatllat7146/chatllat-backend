@@ -62,8 +62,17 @@ app.use(
 app.use(errorHandler);
 
 // Initialize socket.io server
+// const io = new Server(server, {
+//     cors: { origin: "*" },
+// });
 const io = new Server(server, {
-    cors: { origin: "*" },
+    cors: {
+        origin: "https://chatllat-backend.vercel.app",
+        methods: ["GET", "POST"],
+        transports: ['websocket', 'polling'],
+        credentials: true
+    },
+    allowEIO3: true
 });
 global.io = io;
 global.users = {};
@@ -236,7 +245,7 @@ io.on("connection", async (socket) => {
 
 
 app.get('/', (req, res) => {
-    res.send(`backend deployed on port-..${PORT}`)
+    res.send(`backend deployed on port-${PORT}`)
 });
 
 server.listen(PORT, () => console.log("Server is running on PORT: " + PORT));
