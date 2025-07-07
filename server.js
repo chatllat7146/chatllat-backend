@@ -62,11 +62,11 @@ app.use(
 app.use(errorHandler);
 
 // Initialize socket.io server
-export const io = new Server(server, {
-    cors: { origin: "*" },
-});
-global.io = io;
-global.users = {};
+// export const io = new Server(server, {
+//     cors: { origin: "*" },
+// });
+// global.io = io;
+// global.users = {};
 
 // io.on("connection", async (socket) => {
 //     console.log("User connected");
@@ -235,78 +235,78 @@ global.users = {};
 // });
 
 // Socket.io connection handler
-io.on("connection", async (socket) => {
-    console.log("connection");
+// io.on("connection", async (socket) => {
+//     console.log("connection");
 
-    socket.on("connect_user", async (data) => {
-        console.log(data, "connect_user");
-        console.log(socket.id, "socket.id");
-        global.users[data.userid] = socket.id;
+//     socket.on("connect_user", async (data) => {
+//         console.log(data, "connect_user");
+//         console.log(socket.id, "socket.id");
+//         global.users[data.userid] = socket.id;
 
-        const agreementData = await Agreement.findOne({
-            $or: [
-                { payerWallet: data.userid },
-                { receiverWallet: data.userid },
-            ]
-        })
+//         const agreementData = await Agreement.findOne({
+//             $or: [
+//                 { payerWallet: data.userid },
+//                 { receiverWallet: data.userid },
+//             ]
+//         })
 
-        if (data.userid === agreementData.payerWallet) {
-            await Agreement.updateOne({ payerWallet: data.userid }, { "payerDetails.isOnline": 1 });
-        } else {
-            await Agreement.updateOne({ receiverWallet: data.userid }, { "receiverDetails.isOnline": 1 });
-        }
+//         if (data.userid === agreementData.payerWallet) {
+//             await Agreement.updateOne({ payerWallet: data.userid }, { "payerDetails.isOnline": 1 });
+//         } else {
+//             await Agreement.updateOne({ receiverWallet: data.userid }, { "receiverDetails.isOnline": 1 });
+//         }
 
-        io.to(socket.id).emit("connect_user", "user connected.");
-    });
+//         io.to(socket.id).emit("connect_user", "user connected.");
+//     });
 
-    socket.on("sendMessage", async (data) => {
-        try {
-            const sender = data.sender;
-            const receiver = data.receiver;
+//     socket.on("sendMessage", async (data) => {
+//         try {
+//             const sender = data.sender;
+//             const receiver = data.receiver;
 
-            if (!sender || !receiver) {
-                return io
-                    .to(socket.id)
-                    .emit("sendMessageError", "Sender and receiver are required.");
-            }
-            socket.to(global.users[receiver]).emit("receiveMessage", data);
+//             if (!sender || !receiver) {
+//                 return io
+//                     .to(socket.id)
+//                     .emit("sendMessageError", "Sender and receiver are required.");
+//             }
+//             socket.to(global.users[receiver]).emit("receiveMessage", data);
 
-            const messagebody = {
-                sender: data.sender,
-                receiver: data.receiver,
-                msg: data.msg || "",
-                image: data.image || "",
-                document: data.document || "",
-            };
+//             const messagebody = {
+//                 sender: data.sender,
+//                 receiver: data.receiver,
+//                 msg: data.msg || "",
+//                 image: data.image || "",
+//                 document: data.document || "",
+//             };
 
-            await Chat.create(messagebody);
-        } catch (error) {
-            console.error("Error sending message:", error);
-            io.to(socket.id).emit("sendMessageError", "Failed to send message.");
-        }
-    });
+//             await Chat.create(messagebody);
+//         } catch (error) {
+//             console.error("Error sending message:", error);
+//             io.to(socket.id).emit("sendMessageError", "Failed to send message.");
+//         }
+//     });
 
-    socket.on("disconnect", async () => {
-        console.log(socket.id, " Disconnected");
-        const disconnectedUserId = Object.keys(global.users).find(
-            (key) => global.users[key] === socket.id
-        );
+//     socket.on("disconnect", async () => {
+//         console.log(socket.id, " Disconnected");
+//         const disconnectedUserId = Object.keys(global.users).find(
+//             (key) => global.users[key] === socket.id
+//         );
 
-        const agreementData = await Agreement.findOne({
-            $or: [
-                { payerWallet: disconnectedUserId },
-                { receiverWallet: disconnectedUserId },
-            ]
-        })
+//         const agreementData = await Agreement.findOne({
+//             $or: [
+//                 { payerWallet: disconnectedUserId },
+//                 { receiverWallet: disconnectedUserId },
+//             ]
+//         })
 
-        if (disconnectedUserId === agreementData.payerWallet) {
-            await Agreement.updateOne({ payerWallet: disconnectedUserId }, { "payerDetails.isOnline": 0 });
-        } else {
-            await Agreement.updateOne({ receiverWallet: disconnectedUserId }, { "receiverDetails.isOnline": 0 });
-        }
-        delete global.users[disconnectedUserId];
-    });
-});
+//         if (disconnectedUserId === agreementData.payerWallet) {
+//             await Agreement.updateOne({ payerWallet: disconnectedUserId }, { "payerDetails.isOnline": 0 });
+//         } else {
+//             await Agreement.updateOne({ receiverWallet: disconnectedUserId }, { "receiverDetails.isOnline": 0 });
+//         }
+//         delete global.users[disconnectedUserId];
+//     });
+// });
 
 app.get('/', (req, res) => {
     res.send(`backend deployed on port...*${PORT}`)
