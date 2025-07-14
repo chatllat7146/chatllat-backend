@@ -145,64 +145,64 @@ export const transectionConfirmation = asyncHandler(async (req, res, next) => {
         const reqData = req.body;
         console.log(reqData, "req.body======");
 
-        // if (reqData.confirmed == true) {
-        //     if (reqData.erc20Transfers[0].to == process.env.ADMIN_WALLET_ID) {
-        //         // for deposit
-        //         const obj = await getTransectionData(reqData);
-        //         console.log(obj, "obj====");
+        if (reqData.confirmed == true) {
+            if (reqData.erc20Transfers[0].to == process.env.ADMIN_WALLET_ID) {
+                // for deposit
+                const obj = await getTransectionData(reqData);
+                console.log(obj, "obj====");
 
-        //         const agreement = await Agreement.findOne({
-        //             status: "RequestedDeposit",
-        //             payerWallet: obj.fromAddress,
-        //         });
+                const agreement = await Agreement.findOne({
+                    status: "RequestedDeposit",
+                    payerWallet: obj.fromAddress,
+                });
 
-        //         if (agreement) {
-        //             console.log(agreement.agreementId, "agreement===");
-        //             const { expectedWei, actualWei } = await matchAmount(
-        //                 agreement.amountDetails.amount,
-        //                 obj.value,
-        //                 obj.tokenDecimals
-        //             );
-        //             await updateDataWhenFundsIsDeposit(
-        //                 expectedWei,
-        //                 actualWei,
-        //                 agreement.agreementId,
-        //                 obj
-        //             );
-        //         }
-        //     }
+                if (agreement) {
+                    console.log(agreement.agreementId, "agreement===");
+                    const { expectedWei, actualWei } = await matchAmount(
+                        agreement.amountDetails.amount,
+                        obj.value,
+                        obj.tokenDecimals
+                    );
+                    await updateDataWhenFundsIsDeposit(
+                        expectedWei,
+                        actualWei,
+                        agreement.agreementId,
+                        obj
+                    );
+                }
+            }
 
-        //     if (reqData.erc20Transfers[0].from == process.env.ADMIN_WALLET_ID) {
-        //         // for withdrawal
-        //         const obj = await getWithdrawalData(reqData);
-        //         console.log(obj, "obj====");
+            if (reqData.erc20Transfers[0].from == process.env.ADMIN_WALLET_ID) {
+                // for withdrawal
+                const obj = await getWithdrawalData(reqData);
+                console.log(obj, "obj====");
 
-        //         const withdrawalAgreement = await Agreement.findOne({
-        //             status: "RequestedWithdrawal",
-        //             receiverWallet: obj.fromAddress,
-        //             // receiverWallet: obj.toAddress,
-        //         });
+                const withdrawalAgreement = await Agreement.findOne({
+                    status: "RequestedWithdrawal",
+                    receiverWallet: obj.fromAddress,
+                    // receiverWallet: obj.toAddress,
+                });
 
-        //         if (withdrawalAgreement) {
-        //             console.log(
-        //                 withdrawalAgreement.agreementId,
-        //                 "withdrawalAgreement"
-        //             );
+                if (withdrawalAgreement) {
+                    console.log(
+                        withdrawalAgreement.agreementId,
+                        "withdrawalAgreement"
+                    );
 
-        //             const { expectedWei, actualWei } = await matchAmount(
-        //                 withdrawalAgreement.amountDetails.amount,
-        //                 obj.value,
-        //                 obj.tokenDecimals
-        //             );
-        //             await updateDataWhenFundsIsWithdraw(
-        //                 expectedWei,
-        //                 actualWei,
-        //                 withdrawalAgreement.agreementId,
-        //                 obj
-        //             );
-        //         }
-        //     }
-        // }
+                    const { expectedWei, actualWei } = await matchAmount(
+                        withdrawalAgreement.amountDetails.amount,
+                        obj.value,
+                        obj.tokenDecimals
+                    );
+                    await updateDataWhenFundsIsWithdraw(
+                        expectedWei,
+                        actualWei,
+                        withdrawalAgreement.agreementId,
+                        obj
+                    );
+                }
+            }
+        }
 
         return give_response(res, 200, true, "webhook called", {});
     } catch (error) {
